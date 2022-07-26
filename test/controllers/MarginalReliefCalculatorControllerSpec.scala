@@ -16,7 +16,7 @@
 
 package controllers
 
-import calculator.{ ConfigMissingError, MarginalReliefCalculator, MarginalReliefResult, SingleResult }
+import calculator.{ CalculatorResult, ConfigMissingError, FlatRate, MarginalReliefCalculator, SingleResult }
 import cats.syntax.validated._
 import org.mockito.ArgumentMatchersSugar
 import org.mockito.scalatest.IdiomaticMockito
@@ -47,12 +47,12 @@ class MarginalReliefCalculatorControllerSpec
     "return calculator result successfully" in new Fixture {
 
       mockCalculator.compute(accountingPeriodStart, accountingPeriodEnd, 0, 0, None, None, None) returns
-        SingleResult(1970, 0, 0, 0, 0, 0).validNel
+        SingleResult(FlatRate(1970, 0, 0, 0)).validNel
 
       val result: Future[Result] =
         controller.calculate(accountingPeriodStart, accountingPeriodEnd, 0, None, None, None, None)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsJson(result).as[MarginalReliefResult] shouldBe SingleResult(1970, 0, 0, 0, 0, 0)
+      contentAsJson(result).as[CalculatorResult] shouldBe SingleResult(FlatRate(1970, 0, 0, 0))
     }
 
     "throw error when config missing for financial year" in new Fixture {
