@@ -48,12 +48,19 @@ When successful, the result can either be calculations for a single year or two 
 ```json
  {
      "type": "SingleResult",
-     "year": 2022,
-     "effectiveTaxRateBeforeMR": 25,
-     "corporationTaxBeforeMR":15000,
-     "effectiveTaxRate":20.25,
-     "marginalRelief":2850,
-     "corporationTax":12150
+     "details": {
+        "type":"MarginalRate",
+        "taxRateBeforeMR":25,
+        "corporationTaxBeforeMR":15000,
+        "adjustedDistributions":0,
+        "taxRate":20.25,
+        "year":2023,
+        "adjustedUpperThreshold":250000,
+        "marginalRelief":2850,
+        "adjustedLowerThreshold":50000,
+        "corporationTax":12150,
+        "adjustedProfit":60000
+      }
  }
 ```
  *Dual Result*
@@ -62,23 +69,25 @@ When successful, the result can either be calculations for a single year or two 
   {
       "type": "DualResult",
       "year1": {
-        "year": 2022,
-        "corporationTaxBeforeMR": 10000,
-        "effectiveTaxRateBeforeMR": 19,
-        "corporationTax": 10000,
-        "effectiveTaxRate": 10000,
-        "marginalRelief": 0
+          "type": "FlatRate",
+          "year": 2022,
+          "corporationTax": 4684.93,
+          "taxRate": 19,
+          "adjustedProfit": 24657.53
       },
       "year2": {
-        "year": 2023,
-        "corporationTaxBeforeMR": 10000,
-        "effectiveTaxRateBeforeMR": 25,
-        "corporationTax": 8000,
-        "effectiveTaxRate": 22,
-        "marginalRelief": 2000
-      },
-      "effectiveTaxRateBeforeMR": 23,
-      "effectiveTaxRate": 22
+          "type": "MarginalRate",
+          "taxRateBeforeMR": 25,
+          "corporationTaxBeforeMR": 18835.62,
+          "adjustedDistributions": 0,
+          "taxRate": 22.75,
+          "year": 2023,
+          "adjustedUpperThreshold": 188356.16,
+          "marginalRelief": 1695.21,
+          "adjustedLowerThreshold": 37671.23,
+          "corporationTax": 17140.41,
+          "adjustedProfit": 75342.47
+      }
   }
 ```
 
