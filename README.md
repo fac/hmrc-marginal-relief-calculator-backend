@@ -39,9 +39,9 @@ Calculates the marginal relief, based on the financial year config and the user 
 
 |Status|Code|Response Body|Field Path|Field Message|
 |------|----|-------------|----------|-------------|
-|200| OK| Marginal relief caculation result as JSON| | |
+|200| OK| Marginal relief calculation result as JSON| | |
 
-When successful, the result can either be calculations for a single year or two years (when accounting period spans multiple years and there is change in rates/thresholds)
+When successful, the result can either be calculations for a single year or two years (when accounting period spans multiple years)
 
 *Single Result*
 
