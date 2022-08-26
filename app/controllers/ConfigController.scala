@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package calculator
+package controllers
 
-import play.api.libs.json.{ Json, OFormat }
+import config.AppConfig
+import play.api.libs.json.Json
+import play.api.mvc.ControllerComponents
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-object CalculatorConfig {
-  implicit val format: OFormat[CalculatorConfig] = Json.format[CalculatorConfig]
+import javax.inject.Inject
+
+class ConfigController @Inject() (cc: ControllerComponents, appConfig: AppConfig) extends BackendController(cc) {
+  def config = Action {
+    Ok(Json.toJson(appConfig.calculatorConfig))
+  }
 }
-case class CalculatorConfig(fyConfigs: Seq[FYConfig])

@@ -16,12 +16,25 @@
 
 package calculator
 
+import play.api.libs.json.{ Json, OFormat }
+
+object FYConfig {
+  implicit val format: OFormat[FYConfig] = Json.format[FYConfig]
+}
+
 sealed trait FYConfig {
   def year: Int
   def mainRate: Double
 }
 
+object FlatRateConfig {
+  implicit val format: OFormat[FlatRateConfig] = Json.format[FlatRateConfig]
+}
 case class FlatRateConfig(year: Int, mainRate: Double) extends FYConfig
+
+object MarginalReliefConfig {
+  implicit val format: OFormat[MarginalReliefConfig] = Json.format[MarginalReliefConfig]
+}
 case class MarginalReliefConfig(
   year: Int,
   lowerThreshold: Int,
