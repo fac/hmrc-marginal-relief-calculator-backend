@@ -16,10 +16,11 @@
 
 package calculator
 
-import play.api.libs.json.{ Json, OFormat }
+import julienrf.json.derived
+import play.api.libs.json.{ OFormat, __ }
 
 object FYConfig {
-  implicit val format: OFormat[FYConfig] = Json.format[FYConfig]
+  implicit val format: OFormat[FYConfig] = derived.flat.oformat[FYConfig]((__ \ "type").format[String])
 }
 
 sealed trait FYConfig {
@@ -27,14 +28,8 @@ sealed trait FYConfig {
   def mainRate: Double
 }
 
-object FlatRateConfig {
-  implicit val format: OFormat[FlatRateConfig] = Json.format[FlatRateConfig]
-}
 case class FlatRateConfig(year: Int, mainRate: Double) extends FYConfig
 
-object MarginalReliefConfig {
-  implicit val format: OFormat[MarginalReliefConfig] = Json.format[MarginalReliefConfig]
-}
 case class MarginalReliefConfig(
   year: Int,
   lowerThreshold: Int,
