@@ -16,15 +16,20 @@
 
 package controllers
 
+import calculator.ConfigMissingError
+import cats.data.Validated
 import config.AppConfig
 import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 
 class ConfigController @Inject() (cc: ControllerComponents, appConfig: AppConfig) extends BackendController(cc) {
-  def config = Action {
-    Ok(Json.toJson(appConfig.calculatorConfig))
+  def config(year:Int): Action[AnyContent] = Action {
+    Ok(appConfig.findFYConfig(year)(ConfigMissingError) match {
+      case Validated.Valid(a) => Json.toJson(a)
+      case Validated.Invalid(e) => Json.parse(s"""{ "error": "Configuration for year ${e.head.year} is missing." }""")
+    })
   }
 }

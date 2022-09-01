@@ -16,7 +16,7 @@
 
 package config
 
-import calculator.{ CalculatorConfig, FlatRateConfig, MarginalReliefConfig }
+import calculator.{ConfigMissingError, FlatRateConfig, MarginalReliefConfig}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
@@ -48,11 +48,11 @@ class AppConfigSpec extends AnyFreeSpec with Matchers {
                                            | ]
                                            |}
                                            |""".stripMargin)
-        appConfig.calculatorConfig shouldBe CalculatorConfig(
-          Seq(
-            FlatRateConfig(2022, 0.19),
-            MarginalReliefConfig(2023, 50000, 250000, 0.19, 0.25, 0.015)
-          )
+        appConfig.findFYConfig(2022)(ConfigMissingError).map(config =>
+          config shouldBe FlatRateConfig(2022, 0.19),
+        )
+        appConfig.findFYConfig(2023)(ConfigMissingError).map(config =>
+          config shouldBe MarginalReliefConfig(2023, 50000, 250000, 0.19, 0.25, 0.015)
         )
       }
       "should error when config is invalid" in {

@@ -16,11 +16,10 @@
 
 package calculator
 
-import calculator.DateUtils.{ daysBetweenInclusive, daysInFY, financialYearEnd, _ }
+import calculator.DateUtils.{daysBetweenInclusive, daysInFY, financialYearEnd, _}
 import cats.data.ValidatedNel
 import cats.syntax.apply._
-import cats.syntax.validated._
-import com.google.inject.{ ImplementedBy, Inject, Singleton }
+import com.google.inject.{ImplementedBy, Inject, Singleton}
 import config.AppConfig
 
 import java.time.LocalDate
@@ -44,8 +43,6 @@ trait MarginalReliefCalculator {
 @Singleton
 class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends MarginalReliefCalculator {
 
-  private val config: CalculatorConfig = appConfig.calculatorConfig
-
   override def compute(
     accountingPeriodStart: LocalDate,
     accountingPeriodEnd: LocalDate,
@@ -56,13 +53,15 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
     associatedCompaniesFY2: Option[Int]
   ): ValidationResult[CalculatorResult] = {
 
+    def findConfig:Int => ValidationResult[FYConfig] = appConfig.findFYConfig(_)(ConfigMissingError)
+
     val daysInAP: Int = daysBetweenInclusive(accountingPeriodStart, accountingPeriodEnd)
     val fyEndForAPStartDate: LocalDate = financialYearEnd(accountingPeriodStart)
 
     if (fyEndForAPStartDate.isEqualOrAfter(accountingPeriodEnd)) {
       // one financial year
       val fy = fyEndForAPStartDate.minusYears(1).getYear
-      val maybeFYConfig = findFYConfig(fy)
+      val maybeFYConfig = findConfig(fy)
       maybeFYConfig.map {
         case flatRateConfig: FlatRateConfig =>
           val ct = BigDecimal(flatRateConfig.mainRate) * profit
@@ -112,8 +111,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
       val fy1 = fyEndForAPStartDate.minusYears(1).getYear
       val fy2 = fyEndForAPStartDate.getYear
 
-      val maybeFY1Config = findFYConfig(fy1)
-      val maybeFY2Config = findFYConfig(fy2)
+      val maybeFY1Config = findConfig(fy1)
+      val maybeFY2Config = findConfig(fy2)
 
       val apDaysInFY1 = daysBetweenInclusive(accountingPeriodStart, fyEndForAPStartDate)
       val apDaysInFY2 = daysInAP - apDaysInFY1
@@ -347,12 +346,6 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
       }
     }
   }
-
-  private def findFYConfig(year: Int): ValidationResult[FYConfig] =
-    config.fyConfigs.sortBy(_.year)(Ordering[Int].reverse).find(_.year <= year) match {
-      case Some(value) => value.validNel
-      case None        => ConfigMissingError(year).invalidNel
-    }
 
   def calculateCompanies(
     fy1Config: MarginalReliefConfig,
