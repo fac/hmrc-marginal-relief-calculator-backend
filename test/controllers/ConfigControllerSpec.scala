@@ -16,7 +16,7 @@
 
 package controllers
 
-import calculator.{FYConfig, FlatRateConfig, MarginalReliefConfig}
+import calculator.{ FYConfig, FlatRateConfig, MarginalReliefConfig }
 import org.mockito.ArgumentMatchersSugar
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.freespec.AnyFreeSpec
@@ -25,16 +25,17 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsString, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty}
+import play.api.test.Helpers.{ contentAsString, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty }
 
 class ConfigControllerSpec
     extends AnyFreeSpec with Matchers with IdiomaticMockito with ArgumentMatchersSugar with GuiceOneAppPerSuite {
   "GET /config should return json data of config" in {
-        val request = FakeRequest("GET", routes.ConfigController.config(2023).url)
+    val request = FakeRequest("GET", routes.ConfigController.config(2023).url)
     val result = route(app, request).get
 
     status(result) mustEqual 200
-    Json.parse(contentAsString(result)).validate[FYConfig].get mustEqual MarginalReliefConfig(2023, 50000, 250000, 0.19, 0.25, 0.015)
+    Json.parse(contentAsString(result)).validate[FYConfig].get mustEqual MarginalReliefConfig(2023, 50000, 250000, 0.19,
+      0.25, 0.015)
   }
 
   "GET /config should fallback to nearest year if requested year is unavailable" in {
@@ -50,6 +51,8 @@ class ConfigControllerSpec
     val result = route(app, request).get
 
     status(result) mustEqual 200
-    Json.parse(contentAsString(result)) mustEqual Json.parse(s"""{ "error": "Configuration for year ${1000} is missing." }""")
+    Json.parse(contentAsString(result)) mustEqual Json.parse(
+      s"""{ "error": "Configuration for year ${1000} is missing." }"""
+    )
   }
 }

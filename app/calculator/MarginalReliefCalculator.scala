@@ -16,10 +16,10 @@
 
 package calculator
 
-import calculator.DateUtils.{daysBetweenInclusive, daysInFY, financialYearEnd, _}
+import calculator.DateUtils.{ daysBetweenInclusive, daysInFY, financialYearEnd, _ }
 import cats.data.ValidatedNel
 import cats.syntax.apply._
-import com.google.inject.{ImplementedBy, Inject, Singleton}
+import com.google.inject.{ ImplementedBy, Inject, Singleton }
 import config.AppConfig
 
 import java.time.LocalDate
@@ -53,7 +53,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
     associatedCompaniesFY2: Option[Int]
   ): ValidationResult[CalculatorResult] = {
 
-    def findConfig:Int => ValidationResult[FYConfig] = appConfig.findFYConfig(_)(ConfigMissingError)
+    def findConfig: Int => ValidationResult[FYConfig] = appConfig.calculatorConfig.findFYConfig(_)(ConfigMissingError)
 
     val daysInAP: Int = daysBetweenInclusive(accountingPeriodStart, accountingPeriodEnd)
     val fyEndForAPStartDate: LocalDate = financialYearEnd(accountingPeriodStart)

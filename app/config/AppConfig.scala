@@ -16,21 +16,18 @@
 
 package config
 
-import calculator.{CalculatorConfig, FYConfig}
-import cats.data.ValidatedNel
-import cats.implicits.catsSyntaxValidatedId
-import org.slf4j.{Logger, LoggerFactory}
+import calculator.CalculatorConfig
+import org.slf4j.{ Logger, LoggerFactory }
 import play.api.Configuration
 
-import javax.inject.{Inject, Singleton}
-
+import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class AppConfig @Inject() (config: Configuration) {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  private val calculatorConfig: CalculatorConfig =
+  val calculatorConfig: CalculatorConfig =
     CalculatorConfigParser
       .parse(config)
       .fold(
@@ -41,10 +38,4 @@ class AppConfig @Inject() (config: Configuration) {
         },
         fyConfigs => CalculatorConfig(fyConfigs)
       )
-
-  def findFYConfig[T](year: Int)(error:Int => T): ValidatedNel[T, FYConfig] =
-    calculatorConfig.fyConfigs.sortBy(_.year)(Ordering[Int].reverse).find(_.year <= year) match {
-      case Some(value) => value.validNel
-      case None => error(year).invalidNel
-    }
 }

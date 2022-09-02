@@ -16,11 +16,11 @@
 
 package parameters
 
-import calculator.DateUtils.{financialYearEnd, _}
-import calculator.{FYConfig, FlatRateConfig, MarginalReliefConfig}
+import calculator.DateUtils.{ financialYearEnd, _ }
+import calculator.{ FYConfig, FlatRateConfig, MarginalReliefConfig }
 import cats.data.ValidatedNel
 import cats.syntax.apply._
-import com.google.inject.{ImplementedBy, Inject, Singleton}
+import com.google.inject.{ ImplementedBy, Inject, Singleton }
 import config.AppConfig
 
 import java.time.LocalDate
@@ -48,7 +48,7 @@ class AskParametersServiceImpl @Inject() (appConfig: AppConfig) extends AskParam
     exemptDistributions: Option[Double]
   ): ValidationResult[AssociatedCompaniesParameter] = {
 
-    def findConfig:Int => ValidationResult[FYConfig] = appConfig.findFYConfig(_)(ConfigMissingError)
+    def findConfig: Int => ValidationResult[FYConfig] = appConfig.calculatorConfig.findFYConfig(_)(ConfigMissingError)
 
     val fyEndForAccountingPeriodStart: LocalDate = financialYearEnd(accountingPeriodStart)
     if (fyEndForAccountingPeriodStart.isEqualOrAfter(accountingPeriodEnd)) {
