@@ -16,9 +16,17 @@
 
 package calculator
 
+import cats.data.ValidatedNel
+import cats.implicits.catsSyntaxValidatedId
 import play.api.libs.json.{ Json, OFormat }
 
 object CalculatorConfig {
   implicit val format: OFormat[CalculatorConfig] = Json.format[CalculatorConfig]
 }
-case class CalculatorConfig(fyConfigs: Seq[FYConfig])
+case class CalculatorConfig(private val fyConfigs: Seq[FYConfig]) {
+  def findFYConfig[T](year: Int)(error: Int => T): ValidatedNel[T, FYConfig] =
+    this.fyConfigs.sortBy(_.year)(Ordering[Int].reverse).find(_.year <= year) match {
+      case Some(value) => value.validNel
+      case None        => error(year).invalidNel
+    }
+}

@@ -17,10 +17,9 @@
 package parameters
 
 import calculator.DateUtils.{ financialYearEnd, _ }
-import calculator.{ CalculatorConfig, FYConfig, FlatRateConfig, MarginalReliefConfig }
+import calculator.{ FYConfig, FlatRateConfig, MarginalReliefConfig }
 import cats.data.ValidatedNel
 import cats.syntax.apply._
-import cats.syntax.validated._
 import com.google.inject.{ ImplementedBy, Inject, Singleton }
 import config.AppConfig
 
@@ -42,18 +41,19 @@ trait AskParametersService {
 @Singleton
 class AskParametersServiceImpl @Inject() (appConfig: AppConfig) extends AskParametersService {
 
-  private val config: CalculatorConfig = appConfig.calculatorConfig
-
   override def associatedCompaniesParameters(
     accountingPeriodStart: LocalDate,
     accountingPeriodEnd: LocalDate,
     profit: Double,
     exemptDistributions: Option[Double]
   ): ValidationResult[AssociatedCompaniesParameter] = {
+
+    def findConfig: Int => ValidationResult[FYConfig] = appConfig.calculatorConfig.findFYConfig(_)(ConfigMissingError)
+
     val fyEndForAccountingPeriodStart: LocalDate = financialYearEnd(accountingPeriodStart)
     if (fyEndForAccountingPeriodStart.isEqualOrAfter(accountingPeriodEnd)) {
       val fy = fyEndForAccountingPeriodStart.minusYears(1).getYear
-      val maybeFYConfig = findFYConfig(fy)
+      val maybeFYConfig = findConfig(fy)
       maybeFYConfig.map {
         case _: FlatRateConfig =>
           DontAsk
@@ -63,8 +63,8 @@ class AskParametersServiceImpl @Inject() (appConfig: AppConfig) extends AskParam
     } else {
       val fy1 = fyEndForAccountingPeriodStart.minusYears(1).getYear
       val fy2 = fyEndForAccountingPeriodStart.getYear
-      val maybeFY1Config = findFYConfig(fy1)
-      val maybeFY2Config = findFYConfig(fy2)
+      val maybeFY1Config = findConfig(fy1)
+      val maybeFY2Config = findConfig(fy2)
 
       (maybeFY1Config, maybeFY2Config).mapN {
         case (_: FlatRateConfig, _: FlatRateConfig) =>
@@ -84,10 +84,4 @@ class AskParametersServiceImpl @Inject() (appConfig: AppConfig) extends AskParam
       }
     }
   }
-
-  private def findFYConfig(year: Int): ValidationResult[FYConfig] =
-    config.fyConfigs.sortBy(_.year)(Ordering[Int].reverse).find(_.year <= year) match {
-      case Some(value) => value.validNel
-      case None        => ConfigMissingError(year).invalidNel
-    }
 }

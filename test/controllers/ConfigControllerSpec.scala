@@ -16,8 +16,7 @@
 
 package controllers
 
-import calculator.CalculatorConfig
-import config.AppConfig
+import calculator.{ FYConfig, FlatRateConfig, MarginalReliefConfig }
 import org.mockito.ArgumentMatchersSugar
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.freespec.AnyFreeSpec
@@ -25,18 +24,35 @@ import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
-import play.api.test.Helpers.{ contentAsString, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty }
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{ contentAsString, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty }
 
 class ConfigControllerSpec
     extends AnyFreeSpec with Matchers with IdiomaticMockito with ArgumentMatchersSugar with GuiceOneAppPerSuite {
   "GET /config should return json data of config" in {
-    val appConfig = app.injector.instanceOf(classOf[AppConfig])
-    val request = FakeRequest("GET", routes.ConfigController.config().url)
-
+    val request = FakeRequest("GET", routes.ConfigController.config(2023).url)
     val result = route(app, request).get
 
     status(result) mustEqual 200
-    Json.parse(contentAsString(result)).validate[CalculatorConfig].get mustEqual appConfig.calculatorConfig
+    Json.parse(contentAsString(result)).validate[FYConfig].get mustEqual MarginalReliefConfig(2023, 50000, 250000, 0.19,
+      0.25, 0.015)
+  }
+
+  "GET /config should fallback to nearest year if requested year is unavailable" in {
+    val request = FakeRequest("GET", routes.ConfigController.config(3000).url)
+    val result = route(app, request).get
+
+    status(result) mustEqual 200
+    Json.parse(contentAsString(result)).validate[FYConfig].get mustEqual FlatRateConfig(2025, 0.19)
+  }
+
+  "GET /config should return error json if can't find value" in {
+    val request = FakeRequest("GET", routes.ConfigController.config(1000).url)
+    val result = route(app, request).get
+
+    status(result) mustEqual 200
+    Json.parse(contentAsString(result)) mustEqual Json.parse(
+      s"""{ "error": "Configuration for year ${1000} is missing." }"""
+    )
   }
 }

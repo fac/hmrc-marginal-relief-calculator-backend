@@ -27,8 +27,6 @@ class AppConfig @Inject() (config: Configuration) {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  val appName: String = config.get[String]("appName")
-
   val calculatorConfig: CalculatorConfig =
     CalculatorConfigParser
       .parse(config)

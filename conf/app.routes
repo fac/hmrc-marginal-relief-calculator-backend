@@ -2,4 +2,4 @@
 
 GET        /calculate                               controllers.MarginalReliefCalculatorController.calculate(accountingPeriodStart: LocalDate, accountingPeriodEnd: LocalDate, profit: Double, exemptDistributions: Option[Double], associatedCompanies: Option[Int], associatedCompaniesFY1: Option[Int], associatedCompaniesFY2: Option[Int])
 GET        /ask-params/associated-companies         controllers.AskParametersController.associatedCompanies(accountingPeriodStart: LocalDate, accountingPeriodEnd: LocalDate, profit: Double, exemptDistributions: Option[Double])
-GET        /config                                  controllers.ConfigController.config()
+GET        /config/:year                            controllers.ConfigController.config(year:Int)
