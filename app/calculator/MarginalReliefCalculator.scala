@@ -65,7 +65,18 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
       maybeFYConfig.map {
         case flatRateConfig: FlatRateConfig =>
           val ct = BigDecimal(flatRateConfig.mainRate) * profit
-          SingleResult(FlatRate(fy, roundUp(ct), roundUp((ct / profit) * 100), roundUp(profit), daysInAP))
+          val adjustedAugmentedProfit = profit + distributions
+          SingleResult(
+            FlatRate(
+              fy,
+              roundUp(ct),
+              roundUp((ct / profit) * 100),
+              roundUp(profit),
+              roundUp(distributions),
+              roundUp(adjustedAugmentedProfit),
+              daysInAP
+            )
+          )
         case marginalReliefConfig: MarginalReliefConfig =>
           val fyRatio = ratioForAdjustingThresholds(None, daysInAP, daysInFY(fy), daysInAP)
           val companies = associatedCompanies.getOrElse(0) + 1
@@ -100,6 +111,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(marginalRelief),
               roundUp(profit),
               roundUp(distributions),
+              roundUp(profit + distributions),
               roundUp(adjustedLT),
               roundUp(adjustedUT),
               daysInAP
@@ -138,6 +150,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(ctFY1),
               roundUp((ctFY1 / adjustedProfitFY1) * 100),
               roundUp(adjustedProfitFY1),
+              roundUp(adjustedDistributionsFY1),
+              roundUp(adjustedProfitFY1 + adjustedDistributionsFY1),
               apDaysInFY1
             ),
             FlatRate(
@@ -145,6 +159,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(ctFY2),
               roundUp((ctFY2 / adjustedProfitFY2) * 100),
               roundUp(adjustedProfitFY2),
+              roundUp(adjustedDistributionsFY2),
+              roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               apDaysInFY2
             )
           )
@@ -226,6 +242,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(mr1),
               roundUp(adjustedProfitFY1),
               roundUp(adjustedDistributionsFY1),
+              roundUp(adjustedProfitFY1 + adjustedDistributionsFY1),
               roundUp(adjustedLTFY1),
               roundUp(adjustedUTFY1),
               apDaysInFY1
@@ -239,6 +256,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(mr2),
               roundUp(adjustedProfitFY2),
               roundUp(adjustedDistributionsFY2),
+              roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
               apDaysInFY2
@@ -277,6 +295,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(ctFY1),
               roundUp((ctFY1 / adjustedProfitFY1) * 100),
               roundUp(adjustedProfitFY1),
+              roundUp(adjustedDistributionsFY1),
+              roundUp(adjustedProfitFY1 + adjustedDistributionsFY1),
               apDaysInFY1
             ),
             MarginalRate(
@@ -288,6 +308,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(mr2),
               roundUp(adjustedProfitFY2),
               roundUp(adjustedDistributionsFY2),
+              roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
               apDaysInFY2
@@ -331,6 +352,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(mr1),
               roundUp(adjustedProfitFY1),
               roundUp(adjustedDistributionsFY1),
+              roundUp(adjustedProfitFY1 + adjustedDistributionsFY1),
               roundUp(adjustedLTFY1),
               roundUp(adjustedUTFY1),
               apDaysInFY1
@@ -340,6 +362,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(ctFY2),
               roundUp((ctFY2 / adjustedProfitFY2) * 100),
               roundUp(adjustedProfitFY2),
+              roundUp(adjustedDistributionsFY2),
+              roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               apDaysInFY2
             )
           )
