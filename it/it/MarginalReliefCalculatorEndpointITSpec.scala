@@ -25,7 +25,7 @@ class MarginalReliefCalculatorEndpointITSpec
           .get()
           .futureValue
       response.status shouldBe 200
-      response.body shouldBe """{"type":"SingleResult","details":{"type":"MarginalRate","taxRateBeforeMR":25,"corporationTaxBeforeMR":15000,"adjustedDistributions":0,"taxRate":20.25,"year":2023,"adjustedUpperThreshold":250000,"marginalRelief":2850,"adjustedLowerThreshold":50000,"corporationTax":12150,"adjustedProfit":60000,"days":366}}""".stripMargin
+      response.body shouldBe """{"type":"SingleResult","details":{"type":"MarginalRate","taxRateBeforeMR":25,"corporationTaxBeforeMR":15000,"adjustedDistributions":0,"adjustedAugmentedProfit":60000,"taxRate":20.25,"year":2023,"adjustedUpperThreshold":250000,"marginalRelief":2850,"adjustedLowerThreshold":50000,"corporationTax":12150,"adjustedProfit":60000,"days":366}}""".stripMargin
     }
 
     "return bad request error when required parameters are missing (profit missing)" in {

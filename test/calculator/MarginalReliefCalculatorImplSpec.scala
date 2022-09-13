@@ -103,7 +103,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None,
           None
         )
-        result shouldBe SingleResult(FlatRate(2024, 20000.0, 20.0, 100000, 365)).valid
+        result shouldBe SingleResult(FlatRate(2024, 20000.0, 20.0, 100000, 0, 100000, 365)).valid
       }
 
       "when account period falls in FY with only main rate, apply main rate with no marginal relief" in {
@@ -128,7 +128,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None,
           None
         )
-        result shouldBe SingleResult(FlatRate(2022, 19000.0, 19.0, 100000, 365)).valid
+        result shouldBe SingleResult(FlatRate(2022, 19000.0, 19.0, 100000, 0, 100000, 365)).valid
       }
       "when account period falls in FY with marginal relief and profits are above the upper threshold, apply main rate" in {
         val marginalReliefCalculator =
@@ -158,7 +158,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe SingleResult(
-          MarginalRate(2023, 75000.0, 25.0, 75000.0, 25.0, 0.0, 300000.0, 0.0, 50000.0, 250000.0, 366)
+          MarginalRate(2023, 75000.0, 25.0, 75000.0, 25.0, 0.0, 300000.0, 0.0, 300000.0, 50000.0, 250000.0, 366)
         ).valid
       }
       "when account period falls in FY with marginal relief and profits are matching lower threshold, apply small profits rate" in {
@@ -189,7 +189,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe SingleResult(
-          MarginalRate(2023, 9500.0, 19.0, 9500.0, 19.0, 0.0, 50000.0, 0.0, 50000.0, 250000.0, 366)
+          MarginalRate(2023, 9500.0, 19.0, 9500.0, 19.0, 0.0, 50000.0, 0.0, 50000, 50000.0, 250000.0, 366)
         ).valid
       }
       "when account period falls in FY with marginal relief and profits are below lower threshold, apply small profits rate" in {
@@ -220,7 +220,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe SingleResult(
-          MarginalRate(2023, 7600.0, 19.0, 7600.0, 19.0, 0, 40000, 0, 50000, 250000, 366)
+          MarginalRate(2023, 7600.0, 19.0, 7600.0, 19.0, 0, 40000, 0, 40000, 50000, 250000, 366)
         ).valid
       }
       "when account period falls in FY with marginal relief and profits are between upper and lower thresholds, apply main rate with marginal relief" in {
@@ -251,7 +251,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe SingleResult(
-          MarginalRate(2023, 25000.0, 25.0, 22750.0, 22.75, 2250.0, 100000, 0, 50000, 250000, 366)
+          MarginalRate(2023, 25000.0, 25.0, 22750.0, 22.75, 2250.0, 100000, 0, 100000, 50000, 250000, 366)
         ).valid
       }
 
@@ -282,7 +282,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe SingleResult(
-          MarginalRate(2023, 25000.0, 25.0, 24625.0, 24.63, 375.0, 100000.0, 0.0, 25000.0, 125000.0, 366)
+          MarginalRate(2023, 25000.0, 25.0, 24625.0, 24.63, 375.0, 100000.0, 0.0, 100000, 25000.0, 125000.0, 366)
         ).valid
       }
     }
@@ -347,8 +347,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe
           DualResult(
-            MarginalRate(2023, 472.4, 19.0, 472.4, 19.0, 0.0, 2486.34, 0.0, 12431.69, 62158.47, 91),
-            MarginalRate(2024, 1427.6, 19.0, 1427.6, 19.0, 0.0, 7513.66, 0.0, 37568.31, 187841.53, 275)
+            MarginalRate(2023, 472.4, 19.0, 472.4, 19.0, 0.0, 2486.34, 0.0, 2486.34, 12431.69, 62158.47, 91),
+            MarginalRate(2024, 1427.6, 19.0, 1427.6, 19.0, 0.0, 7513.66, 0.0, 7513.66, 37568.31, 187841.53, 275)
           ).valid
       }
 
@@ -385,8 +385,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe DualResult(
-          MarginalRate(2024, 468.49, 19.0, 468.49, 19.0, 0.0, 2465.75, 0.0, 12328.77, 61643.84, 90),
-          MarginalRate(2025, 1431.51, 19.0, 1431.51, 19.0, 0.0, 7534.25, 0.0, 37671.23, 188356.16, 275)
+          MarginalRate(2024, 468.49, 19.0, 468.49, 19.0, 0.0, 2465.75, 0.0, 2465.75, 12328.77, 61643.84, 90),
+          MarginalRate(2025, 1431.51, 19.0, 1431.51, 19.0, 0.0, 7534.25, 0.0, 7534.25, 37671.23, 188356.16, 275)
         ).valid
       }
 
@@ -419,7 +419,10 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           None
         )
         result shouldBe
-          DualResult(FlatRate(2022, 4684.93, 19.0, 24657.53, 90), FlatRate(2023, 15068.49, 20.0, 75342.47, 275)).valid
+          DualResult(
+            FlatRate(2022, 4684.93, 19.0, 24657.53, 0, 24657.53, 90),
+            FlatRate(2023, 15068.49, 20.0, 75342.47, 0, 75342.47, 275)
+          ).valid
 
       }
 
@@ -461,8 +464,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe
           DualResult(
-            MarginalRate(2023, 3125.0, 25.0, 2377.57, 19.02, 747.43, 12500.0, 0.0, 12465.75, 62328.77, 91),
-            MarginalRate(2024, 3125.0, 25.0, 2377.57, 19.02, 747.43, 12500.0, 0.0, 12465.75, 62328.77, 91)
+            MarginalRate(2023, 3125.0, 25.0, 2377.57, 19.02, 747.43, 12500.0, 0.0, 12500.0, 12465.75, 62328.77, 91),
+            MarginalRate(2024, 3125.0, 25.0, 2377.57, 19.02, 747.43, 12500.0, 0.0, 12500.0, 12465.75, 62328.77, 91)
           ).valid
 
       }
@@ -500,8 +503,9 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe
           DualResult(
-            MarginalRate(2023, 14583.33, 25.0, 14416.67, 24.71, 166.67, 58333.33, 0.0, 13888.89, 69444.44, 305),
-            FlatRate(2024, 2216.67, 19.0, 11666.67, 61)
+            MarginalRate(2023, 14583.33, 25.0, 14416.67, 24.71, 166.67, 58333.33, 0.0, 58333.33, 13888.89, 69444.44,
+              305),
+            FlatRate(2024, 2216.67, 19.0, 11666.67, 0, 11666.67, 61)
           ).valid
       }
       "when FY1 with MR rate and FY2 with MR rate (no change in config), associated companies in (FY1, FY2) and profits within thresholds" in {
@@ -542,8 +546,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe
           DualResult(
-            MarginalRate(2023, 7500.0, 25.0, 7481.25, 24.94, 18.75, 30000.0, 0.0, 6250.0, 31250.0, 183),
-            MarginalRate(2024, 7500.0, 25.0, 7481.25, 24.94, 18.75, 30000.0, 0.0, 6250.0, 31250.0, 183)
+            MarginalRate(2023, 7500.0, 25.0, 7481.25, 24.94, 18.75, 30000.0, 0.0, 30000, 6250.0, 31250.0, 183),
+            MarginalRate(2024, 7500.0, 25.0, 7481.25, 24.94, 18.75, 30000.0, 0.0, 30000, 6250.0, 31250.0, 183)
           ).valid
 
       }
@@ -585,8 +589,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe
           DualResult(
-            MarginalRate(2023, 7500.0, 25.0, 7325.0, 24.42, 175.0, 30000.0, 0.0, 8333.33, 41666.67, 183),
-            MarginalRate(2024, 7500.0, 25.0, 7385.96, 24.62, 114.04, 30000.0, 0.0, 6267.12, 37602.74, 183)
+            MarginalRate(2023, 7500.0, 25.0, 7325.0, 24.42, 175.0, 30000.0, 0.0, 30000, 8333.33, 41666.67, 183),
+            MarginalRate(2024, 7500.0, 25.0, 7385.96, 24.62, 114.04, 30000.0, 0.0, 30000, 6267.12, 37602.74, 183)
           ).valid
 
       }
@@ -623,8 +627,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe
           DualResult(
-            FlatRate(2022, 8198.63, 19.0, 43150.68, 90),
-            MarginalRate(2023, 32962.33, 25.0, 32962.33, 25.0, 0.0, 131849.32, 0.0, 12557.08, 62785.39, 275)
+            FlatRate(2022, 8198.63, 19.0, 43150.68, 0, 43150.68, 90),
+            MarginalRate(2023, 32962.33, 25.0, 32962.33, 25.0, 0.0, 131849.32, 0.0, 131849.32, 12557.08, 62785.39, 275)
           ).valid
       }
     }
@@ -662,8 +666,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2023, 3107.92, 25.0, 3035.41, 24.42, 72.52, 12431.69, 2486.34, 4143.9, 20719.49, 91),
-          FlatRate(2024, 7137.98, 19.0, 37568.31, 275)
+          MarginalRate(2023, 3107.92, 25.0, 3035.41, 24.42, 72.52, 12431.69, 2486.34, 14918.03, 4143.9, 20719.49, 91),
+          FlatRate(2024, 7137.98, 19.0, 37568.31, 7513.66, 45081.97, 275)
         ).valid
     }
 
@@ -700,8 +704,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          FlatRate(2022, 2810.96, 19.0, 14794.52, 90),
-          MarginalRate(2023, 11301.37, 25.0, 11037.67, 24.42, 263.7, 45205.48, 0.0, 12557.08, 62785.39, 275)
+          FlatRate(2022, 2810.96, 19.0, 14794.52, 0, 14794.52, 90),
+          MarginalRate(2023, 11301.37, 25.0, 11037.67, 24.42, 263.7, 45205.48, 0.0, 45205.48, 12557.08, 62785.39, 275)
         ).valid
     }
 
@@ -738,8 +742,9 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          FlatRate(2022, 2342.47, 19.0, 12328.77, 90),
-          MarginalRate(2023, 9417.81, 25.0, 8805.65, 23.38, 612.16, 37671.23, 7534.25, 18835.62, 94178.08, 275)
+          FlatRate(2022, 2342.47, 19.0, 12328.77, 2465.75, 14794.52, 90),
+          MarginalRate(2023, 9417.81, 25.0, 8805.65, 23.38, 612.16, 37671.23, 7534.25, 45205.48, 18835.62, 94178.08,
+            275)
         ).valid
     }
 
@@ -776,8 +781,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2023, 3107.92, 25.0, 2905.91, 23.38, 202.02, 12431.69, 2486.34, 6215.85, 31079.23, 91),
-          FlatRate(2024, 7137.98, 19.0, 37568.31, 275)
+          MarginalRate(2023, 3107.92, 25.0, 2905.91, 23.38, 202.02, 12431.69, 2486.34, 14918.03, 6215.85, 31079.23, 91),
+          FlatRate(2024, 7137.98, 19.0, 37568.31, 7513.66, 45081.97, 275)
         ).valid
     }
 
@@ -818,8 +823,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2023, 6875.0, 25.0, 6818.75, 24.8, 56.25, 27500.0, 0.0, 6250.0, 31250.0, 183),
-          MarginalRate(2024, 6875.0, 25.0, 6818.75, 24.8, 56.25, 27500.0, 0.0, 6250.0, 31250.0, 183)
+          MarginalRate(2023, 6875.0, 25.0, 6818.75, 24.8, 56.25, 27500.0, 0.0, 27500.0, 6250.0, 31250.0, 183),
+          MarginalRate(2024, 6875.0, 25.0, 6818.75, 24.8, 56.25, 27500.0, 0.0, 27500.0, 6250.0, 31250.0, 183)
         ).valid
 
     }
@@ -860,8 +865,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2027, 2797.13, 25.0, 2778.48, 24.83, 18.65, 11188.52, 0.0, 2486.34, 12431.69, 91),
-          MarginalRate(2028, 8790.98, 26.0, 8734.63, 25.83, 56.35, 33811.48, 0.0, 7513.66, 37568.31, 275)
+          MarginalRate(2027, 2797.13, 25.0, 2778.48, 24.83, 18.65, 11188.52, 0.0, 11188.52, 2486.34, 12431.69, 91),
+          MarginalRate(2028, 8790.98, 26.0, 8734.63, 25.83, 56.35, 33811.48, 0.0, 33811.48, 7513.66, 37568.31, 275)
         ).valid
 
     }
@@ -902,8 +907,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2030, 15952.05, 25.0, 15952.05, 25.0, 0.0, 63808.22, 0.0, 12511.42, 62557.08, 274),
-          MarginalRate(2031, 5297.95, 25.0, 5104.71, 24.09, 193.24, 21191.78, 0.0, 6215.85, 37295.08, 91)
+          MarginalRate(2030, 15952.05, 25.0, 15952.05, 25.0, 0.0, 63808.22, 0.0, 63808.22, 12511.42, 62557.08, 274),
+          MarginalRate(2031, 5297.95, 25.0, 5104.71, 24.09, 193.24, 21191.78, 0.0, 21191.78, 6215.85, 37295.08, 91)
         ).valid
 
     }
@@ -944,8 +949,9 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2023, 6232.88, 25.0, 5671.92, 22.75, 560.96, 24931.51, 0.0, 12465.75, 62328.77, 91),
-          MarginalRate(2024, 19517.81, 26.0, 17828.77, 23.75, 1689.04, 75068.49, 0.0, 37534.25, 187671.23, 274)
+          MarginalRate(2023, 6232.88, 25.0, 5671.92, 22.75, 560.96, 24931.51, 0.0, 24931.51, 12465.75, 62328.77, 91),
+          MarginalRate(2024, 19517.81, 26.0, 17828.77, 23.75, 1689.04, 75068.49, 0.0, 75068.49, 37534.25, 187671.23,
+            274)
         ).valid
     }
     "when associated companies in FY1 and no associated companies in FY2, FY1 and FY2 are MR rates" in {
@@ -985,8 +991,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2023, 6232.88, 25.0, 6139.38, 24.63, 93.49, 24931.51, 0.0, 6232.88, 31164.38, 91),
-          MarginalRate(2024, 18767.12, 25.0, 18485.62, 24.63, 281.51, 75068.49, 0.0, 18767.12, 93835.62, 274)
+          MarginalRate(2023, 6232.88, 25.0, 6139.38, 24.63, 93.49, 24931.51, 0.0, 24931.51, 6232.88, 31164.38, 91),
+          MarginalRate(2024, 18767.12, 25.0, 18485.62, 24.63, 281.51, 75068.49, 0.0, 75068.49, 18767.12, 93835.62, 274)
         ).valid
     }
     "when no associated companies in FY1 and associated companies in FY2, FY1 and FY2 are MR rates" in {
@@ -1026,8 +1032,8 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       )
       result shouldBe
         DualResult(
-          MarginalRate(2023, 6232.88, 25.0, 6139.38, 24.63, 93.49, 24931.51, 0.0, 6232.88, 31164.38, 91),
-          MarginalRate(2024, 18767.12, 25.0, 18485.62, 24.63, 281.51, 75068.49, 0.0, 18767.12, 93835.62, 274)
+          MarginalRate(2023, 6232.88, 25.0, 6139.38, 24.63, 93.49, 24931.51, 0.0, 24931.51, 6232.88, 31164.38, 91),
+          MarginalRate(2024, 18767.12, 25.0, 18485.62, 24.63, 281.51, 75068.49, 0.0, 75068.49, 18767.12, 93835.62, 274)
         ).valid
     }
   }

@@ -20,8 +20,15 @@ import julienrf.json.derived
 import play.api.libs.json.{ OFormat, __ }
 
 sealed trait TaxDetails
-case class FlatRate(year: Int, corporationTax: Double, taxRate: Double, adjustedProfit: Double, days: Int)
-    extends TaxDetails
+case class FlatRate(
+  year: Int,
+  corporationTax: Double,
+  taxRate: Double,
+  adjustedProfit: Double,
+  adjustedDistributions: Double,
+  adjustedAugmentedProfit: Double,
+  days: Int
+) extends TaxDetails
 case class MarginalRate(
   year: Int,
   corporationTaxBeforeMR: Double,
@@ -31,6 +38,7 @@ case class MarginalRate(
   marginalRelief: Double,
   adjustedProfit: Double,
   adjustedDistributions: Double,
+  adjustedAugmentedProfit: Double,
   adjustedLowerThreshold: Double,
   adjustedUpperThreshold: Double,
   days: Int

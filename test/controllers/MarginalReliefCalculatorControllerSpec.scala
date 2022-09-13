@@ -47,12 +47,12 @@ class MarginalReliefCalculatorControllerSpec
     "return calculator result successfully" in new Fixture {
 
       mockCalculator.compute(accountingPeriodStart, accountingPeriodEnd, 0, 0, None, None, None) returns
-        SingleResult(FlatRate(1970, 0, 0, 0, 0)).validNel
+        SingleResult(FlatRate(1970, 0, 0, 0, 0, 0, 0)).validNel
 
       val result: Future[Result] =
         controller.calculate(accountingPeriodStart, accountingPeriodEnd, 0, None, None, None, None)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsJson(result).as[CalculatorResult] shouldBe SingleResult(FlatRate(1970, 0, 0, 0, 0))
+      contentAsJson(result).as[CalculatorResult] shouldBe SingleResult(FlatRate(1970, 0, 0, 0, 0, 0, 0))
     }
 
     "throw error when config missing for financial year" in new Fixture {
