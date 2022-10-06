@@ -49,17 +49,21 @@ object TaxDetails {
     derived.flat.oformat[TaxDetails]((__ \ "type").format[String])
 }
 
-sealed trait CalculatorResult
+sealed trait CalculatorResult {
+  def effectiveTaxRate: Double
+}
 object CalculatorResult {
   implicit val format: OFormat[CalculatorResult] =
     derived.flat.oformat[CalculatorResult]((__ \ "type").format[String])
 }
 
 case class SingleResult(
-  details: TaxDetails
+  details: TaxDetails,
+  effectiveTaxRate: Double
 ) extends CalculatorResult
 
 case class DualResult(
   year1: TaxDetails,
-  year2: TaxDetails
+  year2: TaxDetails,
+  effectiveTaxRate: Double
 ) extends CalculatorResult
