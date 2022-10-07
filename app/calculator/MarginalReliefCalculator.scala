@@ -66,16 +66,18 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
         case flatRateConfig: FlatRateConfig =>
           val ct = BigDecimal(flatRateConfig.mainRate) * profit
           val adjustedAugmentedProfit = profit + distributions
+          val taxRate = roundUp((ct / profit) * 100)
           SingleResult(
             FlatRate(
               fy,
               roundUp(ct),
-              roundUp((ct / profit) * 100),
+              taxRate,
               roundUp(profit),
               roundUp(distributions),
               roundUp(adjustedAugmentedProfit),
               daysInAP
-            )
+            ),
+            taxRate
           )
         case marginalReliefConfig: MarginalReliefConfig =>
           val fyRatio = ratioForAdjustingThresholds(None, daysInAP, daysInFY(fy), daysInAP)
@@ -115,7 +117,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLT),
               roundUp(adjustedUT),
               daysInAP
-            )
+            ),
+            effectiveRate
           )
       }
     } else {
@@ -144,6 +147,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
         case (fy1Config: FlatRateConfig, fy2Config: FlatRateConfig) =>
           val ctFY1 = BigDecimal(fy1Config.mainRate) * adjustedProfitFY1
           val ctFY2 = BigDecimal(fy2Config.mainRate) * adjustedProfitFY2
+          val effectiveTaxRate = ((ctFY1 + ctFY2) / (adjustedProfitFY1 + adjustedProfitFY2)) * 100
           DualResult(
             FlatRate(
               fy1,
@@ -162,7 +166,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedDistributionsFY2),
               roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               apDaysInFY2
-            )
+            ),
+            roundUp(effectiveTaxRate)
           )
         case (fy1Config: MarginalReliefConfig, fy2Config: MarginalReliefConfig) =>
           val fy1Ratio = ratioForAdjustingThresholds(
@@ -232,6 +237,9 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
             fy2Config.marginalReliefFraction
           )
 
+
+          val effectiveTaxRate = ((ctFY1 - mr1 + ctFY2 - mr2) / (adjustedProfitFY1 + adjustedProfitFY2)) * 100
+
           DualResult(
             MarginalRate(
               fy1,
@@ -260,7 +268,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
               apDaysInFY2
-            )
+            ),
+            roundUp(effectiveTaxRate)
           )
         case (fy1Config: FlatRateConfig, fy2Config: MarginalReliefConfig) =>
           val ctFY1 = BigDecimal(fy1Config.mainRate) * adjustedProfitFY1
@@ -282,6 +291,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               fy2Config.smallProfitRate,
               fy2Config.mainRate
             )
+
           val mr2 = computeMarginalRelief(
             adjustedProfitFY2,
             adjustedAugmentedProfitFY2,
@@ -289,6 +299,9 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
             adjustedUTFY2,
             fy2Config.marginalReliefFraction
           )
+
+          val effectiveTaxRate = ((ctFY1 + ctFY2 - mr2) / (adjustedProfitFY1 + adjustedProfitFY2)) * 100
+
           DualResult(
             FlatRate(
               fy1,
@@ -312,7 +325,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
               apDaysInFY2
-            )
+            ),
+            roundUp(effectiveTaxRate)
           )
         case (fy1Config: MarginalReliefConfig, fy2Config: FlatRateConfig) =>
           val fy1Ratio = ratioForAdjustingThresholds(
@@ -342,6 +356,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
           )
           val ctFY2 = BigDecimal(fy2Config.mainRate) * adjustedProfitFY2
 
+          val effectiveTaxRate = ((ctFY1 - mr1 + ctFY2) / (adjustedProfitFY1 + adjustedProfitFY2)) * 100
+
           DualResult(
             MarginalRate(
               fy1,
@@ -365,7 +381,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedDistributionsFY2),
               roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               apDaysInFY2
-            )
+            ),
+            roundUp(effectiveTaxRate)
           )
       }
     }
