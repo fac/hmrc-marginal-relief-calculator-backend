@@ -237,7 +237,6 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
             fy2Config.marginalReliefFraction
           )
 
-
           val effectiveTaxRate = ((ctFY1 - mr1 + ctFY2 - mr2) / (adjustedProfitFY1 + adjustedProfitFY2)) * 100
 
           DualResult(
