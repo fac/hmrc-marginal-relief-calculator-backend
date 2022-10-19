@@ -19,6 +19,13 @@ package calculator
 import julienrf.json.derived
 import play.api.libs.json.{ OFormat, __ }
 
+object ThresholdAdjustmentRatioValues {
+  def apply(values: (BigDecimal, Int)): ThresholdAdjustmentRatioValues =
+    ThresholdAdjustmentRatioValues(values._1.toInt, values._2)
+  implicit val format: OFormat[ThresholdAdjustmentRatioValues] = derived.oformat[ThresholdAdjustmentRatioValues]()
+}
+case class ThresholdAdjustmentRatioValues(numerator: Int, denominator: Int)
+
 sealed trait TaxDetails
 case class FlatRate(
   year: Int,
@@ -41,7 +48,8 @@ case class MarginalRate(
   adjustedAugmentedProfit: Double,
   adjustedLowerThreshold: Double,
   adjustedUpperThreshold: Double,
-  days: Int
+  days: Int,
+  thresholdAdjustmentRatioValues: ThresholdAdjustmentRatioValues
 ) extends TaxDetails
 
 object TaxDetails {
