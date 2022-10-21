@@ -118,7 +118,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLT),
               roundUp(adjustedUT),
               daysInAP,
-              ThresholdAdjustmentRatioValues(fyRatioValues)
+              fyRatioValues
             ),
             effectiveRate
           )
@@ -258,7 +258,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLTFY1),
               roundUp(adjustedUTFY1),
               apDaysInFY1,
-              ThresholdAdjustmentRatioValues(fy1RatioValues)
+              fy1RatioValues
             ),
             MarginalRate(
               fy2,
@@ -273,7 +273,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
               apDaysInFY2,
-              ThresholdAdjustmentRatioValues(fy2RatioValues)
+              fy2RatioValues
             ),
             roundUp(effectiveTaxRate)
           )
@@ -334,7 +334,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
               apDaysInFY2,
-              ThresholdAdjustmentRatioValues(fy2RatioValues)
+              fy2RatioValues
             ),
             roundUp(effectiveTaxRate)
           )
@@ -385,7 +385,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedLTFY1),
               roundUp(adjustedUTFY1),
               apDaysInFY1,
-              ThresholdAdjustmentRatioValues(fy1RatioValues)
+              fy1RatioValues
             ),
             FlatRate(
               fy2,
@@ -462,14 +462,14 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
     apDaysInFY: Int,
     fyDays: Int,
     daysInAP: Int
-  ): (BigDecimal, Int) =
+  ): FYRatio =
     maybeUpperThresholds match {
       case Some(UpperThresholds(upperThresholdFY1, upperThresholdFY2)) if upperThresholdFY1 != upperThresholdFY2 =>
-        BigDecimal(apDaysInFY) -> fyDays
+        FYRatio(BigDecimal(apDaysInFY), fyDays)
       case _ => // flat rate year
-        BigDecimal(apDaysInFY) -> (if (daysInAP == 366) 366 else 365)
+        FYRatio(BigDecimal(apDaysInFY), if (daysInAP == 366) 366 else 365)
     }
-  private def ratioForAdjustingThresholds(values: (BigDecimal, Int)): BigDecimal = values._1 / values._2
+  private def ratioForAdjustingThresholds(values: FYRatio): BigDecimal = values.numerator / values.denominator
 
   private def adjustedThreshold(threshold: Int, fyRatio: BigDecimal, companies: Int): BigDecimal =
     (threshold * fyRatio) / BigDecimal(companies)
