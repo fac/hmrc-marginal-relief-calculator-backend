@@ -19,6 +19,11 @@ package calculator
 import julienrf.json.derived
 import play.api.libs.json.{ OFormat, __ }
 
+object FYRatio {
+  implicit val format: OFormat[FYRatio] = derived.oformat[FYRatio]()
+}
+case class FYRatio(numerator: BigDecimal, denominator: Int)
+
 sealed trait TaxDetails
 case class FlatRate(
   year: Int,
@@ -41,7 +46,8 @@ case class MarginalRate(
   adjustedAugmentedProfit: Double,
   adjustedLowerThreshold: Double,
   adjustedUpperThreshold: Double,
-  days: Int
+  days: Int,
+  fyRatio: FYRatio
 ) extends TaxDetails
 
 object TaxDetails {

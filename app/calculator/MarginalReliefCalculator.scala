@@ -80,7 +80,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
             taxRate
           )
         case marginalReliefConfig: MarginalReliefConfig =>
-          val fyRatio = ratioForAdjustingThresholds(None, daysInAP, daysInFY(fy), daysInAP)
+          val fyRatioValues = ratioValuesForAdjustingThresholds(None, daysInAP, daysInFY(fy), daysInAP)
+          val fyRatio = ratioForAdjustingThresholds(fyRatioValues)
           val companies = associatedCompanies.getOrElse(0) + 1
           val adjustedLT = adjustedThreshold(marginalReliefConfig.lowerThreshold, fyRatio, companies)
           val adjustedUT = adjustedThreshold(marginalReliefConfig.upperThreshold, fyRatio, companies)
@@ -116,7 +117,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(profit + distributions),
               roundUp(adjustedLT),
               roundUp(adjustedUT),
-              daysInAP
+              daysInAP,
+              fyRatioValues
             ),
             effectiveRate
           )
@@ -170,18 +172,21 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
             roundUp(effectiveTaxRate)
           )
         case (fy1Config: MarginalReliefConfig, fy2Config: MarginalReliefConfig) =>
-          val fy1Ratio = ratioForAdjustingThresholds(
+          val fy1RatioValues = ratioValuesForAdjustingThresholds(
             Some(UpperThresholds(fy1Config.upperThreshold, fy2Config.upperThreshold)),
             apDaysInFY1,
             daysInFY(fy1),
             daysInAP
           )
-          val fy2Ratio = ratioForAdjustingThresholds(
+          val fy2RatioValues = ratioValuesForAdjustingThresholds(
             Some(UpperThresholds(fy1Config.upperThreshold, fy2Config.upperThreshold)),
             apDaysInFY2,
             daysInFY(fy2),
             daysInAP
           )
+
+          val fy1Ratio = ratioForAdjustingThresholds(fy1RatioValues)
+          val fy2Ratio = ratioForAdjustingThresholds(fy2RatioValues)
 
           val companiesFY1 = calculateCompanies(
             fy1Config,
@@ -252,7 +257,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedProfitFY1 + adjustedDistributionsFY1),
               roundUp(adjustedLTFY1),
               roundUp(adjustedUTFY1),
-              apDaysInFY1
+              apDaysInFY1,
+              fy1RatioValues
             ),
             MarginalRate(
               fy2,
@@ -266,18 +272,22 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
-              apDaysInFY2
+              apDaysInFY2,
+              fy2RatioValues
             ),
             roundUp(effectiveTaxRate)
           )
         case (fy1Config: FlatRateConfig, fy2Config: MarginalReliefConfig) =>
           val ctFY1 = BigDecimal(fy1Config.mainRate) * adjustedProfitFY1
-          val fy2Ratio = ratioForAdjustingThresholds(
+          val fy2RatioValues = ratioValuesForAdjustingThresholds(
             None,
             apDaysInFY2,
             daysInFY(fy2),
             daysInAP
           )
+
+          val fy2Ratio = ratioForAdjustingThresholds(fy2RatioValues)
+
           val companiesFY2 = associatedCompanies.map(_ + 1).orElse(associatedCompaniesFY2.map(_ + 1)).getOrElse(1)
           val adjustedLTFY2 = adjustedThreshold(fy2Config.lowerThreshold, fy2Ratio, companiesFY2)
           val adjustedUTFY2 = adjustedThreshold(fy2Config.upperThreshold, fy2Ratio, companiesFY2)
@@ -323,17 +333,21 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedProfitFY2 + adjustedDistributionsFY2),
               roundUp(adjustedLTFY2),
               roundUp(adjustedUTFY2),
-              apDaysInFY2
+              apDaysInFY2,
+              fy2RatioValues
             ),
             roundUp(effectiveTaxRate)
           )
         case (fy1Config: MarginalReliefConfig, fy2Config: FlatRateConfig) =>
-          val fy1Ratio = ratioForAdjustingThresholds(
+          val fy1RatioValues = ratioValuesForAdjustingThresholds(
             None,
             apDaysInFY1,
             daysInFY(fy1),
             daysInAP
           )
+
+          val fy1Ratio = ratioForAdjustingThresholds(fy1RatioValues)
+
           val companiesFY1 = associatedCompanies.map(_ + 1).orElse(associatedCompaniesFY1.map(_ + 1)).getOrElse(1)
           val adjustedLTFY1 = adjustedThreshold(fy1Config.lowerThreshold, fy1Ratio, companiesFY1)
           val adjustedUTFY1 = adjustedThreshold(fy1Config.upperThreshold, fy1Ratio, companiesFY1)
@@ -370,7 +384,8 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
               roundUp(adjustedProfitFY1 + adjustedDistributionsFY1),
               roundUp(adjustedLTFY1),
               roundUp(adjustedUTFY1),
-              apDaysInFY1
+              apDaysInFY1,
+              fy1RatioValues
             ),
             FlatRate(
               fy2,
@@ -442,18 +457,19 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
 
   case class UpperThresholds(upperThresholdFY1: Int, upperThresholdFY2: Int)
 
-  private def ratioForAdjustingThresholds(
+  private def ratioValuesForAdjustingThresholds(
     maybeUpperThresholds: Option[UpperThresholds],
     apDaysInFY: Int,
     fyDays: Int,
     daysInAP: Int
-  ): BigDecimal =
+  ): FYRatio =
     maybeUpperThresholds match {
       case Some(UpperThresholds(upperThresholdFY1, upperThresholdFY2)) if upperThresholdFY1 != upperThresholdFY2 =>
-        BigDecimal(apDaysInFY) / fyDays
+        FYRatio(BigDecimal(apDaysInFY), fyDays)
       case _ => // flat rate year
-        BigDecimal(apDaysInFY) / (if (daysInAP == 366) 366 else 365)
+        FYRatio(BigDecimal(apDaysInFY), if (daysInAP == 366) 366 else 365)
     }
+  private def ratioForAdjustingThresholds(values: FYRatio): BigDecimal = values.numerator / values.denominator
 
   private def adjustedThreshold(threshold: Int, fyRatio: BigDecimal, companies: Int): BigDecimal =
     (threshold * fyRatio) / BigDecimal(companies)
