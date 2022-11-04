@@ -160,4 +160,61 @@ and associatedCompaniesFY2 parameters.
       }
   }
 ```
+### Required Parameters - Config year
+
+Returns a specific year from the backend configuration file.
+ 
+**Method:** `GET`
+
+**Path:** `/marginal-relief-calculator-backend/config/:year`
+
+**Query Params**
+
+| Name                | Type    | Description                    |Required| Format     |Example Value|
+|---------------------|---------|--------------------------------|--------|------------|-------------|
+| year                | Int     | The year of configuration      |Yes| YYYY       |2023|
+
+**Responses**
+
+|Status|Code| Response Body  |Field Path|Field Message|
+|------|----|----------------|----------|-------------|
+|200| OK| config as JSON | | |
+
+When successful, the result can be validated as either valid or invalid. 
+A valid response can either be flat rate or marginal relief rate depending on 
+the configuration year, and an invalid response will result in an error being thrown.
+
+If the input year occurs before the configured years (i.e. 2015), an error will be thrown. 
+If the input year occurs after the configured years (i.e. 2040), the latest year in config will be returned (i.e. 2025).
+
+*Valid Flat Rate result*
+
+```json
+  {
+        "type": "FlatRateConfig",
+        "year": 2022,
+        "mainRate": 0.19
+  }
+```
+*Valid Marginal Relief Rate result*
+```json
+  {
+      "type": "MarginalReliefConfig",
+      "marginalReliefFraction": 0.012,
+      "lowerThreshold": 50000,
+      "mainRate": 0.25,
+      "year": 2024,
+      "upperThreshold": 300000,
+      "smallProfitRate": 0.19
+  }
+```
+
+*Invalid result*
+
+```json
+ {
+      "error": "Configuration for year ${year} is missing."
+ }
+```
+
 
