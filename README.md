@@ -1,9 +1,12 @@
 # Marginal Relief Calculator
 
-This service provides an API for calculating the marginal relief and corporation tax liablity, based on the available configuration for financial years. It
-also provides a break-down of the calculation to interpreting how the marginal relief and CT liablity was calculated.
+This service provides an API for calculating the marginal relief and corporation tax liability, based on the available configuration for financial years. It
+also provides a break-down of the calculation to interpreting how the marginal relief and CT liability was calculated.
 
+The service has three end points: calculate, associated companies and config year. 
 ## Running in DEV mode
+
+To run the service you need the following installed: `Java 1.8`, `Mongo 4.0.25`, `sbt 1.7.1`
 
 To start the service locally, execute the following command
 
@@ -12,6 +15,8 @@ To start the service locally, execute the following command
 To run locally using Service Manager
 
 ```sm --start MARGINAL_RELIEF_CALCULATOR_BACKEND```
+
+```sm --start DATASTREAM```
 
 ## REST API Details
 
@@ -185,7 +190,7 @@ A valid response can either be flat rate or marginal relief rate depending on
 the configuration year, and an invalid response will result in an error being thrown.
 
 If the input year occurs before the configured years (i.e. 2015), an error will be thrown. 
-If the input year occurs after the configured years (i.e. 2040), the latest year in config will be returned (i.e. 2025).
+If the input year occurs after the configured years (i.e. 2040), the most recent year in config will be returned (i.e. 2025).
 
 *Valid Flat Rate result*
 
