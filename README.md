@@ -6,17 +6,12 @@ also provides a break-down of the calculation to interpreting how the marginal r
 The service has three end points: calculate, associated companies and config year. 
 ## Running in DEV mode
 
-To run the service you need the following installed: `Java 1.8`, `Mongo 4.0.25`, `sbt 1.7.1`
+To run the service you need the following installed: `Java 1.8`, `sbt 1.7.1`
 
-To start the service locally, execute the following command
+To start the service locally, execute the following command 
 
 ```$ sbt -jvm-debug DEBUG_PORT run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes ```
 
-To run locally using Service Manager
-
-```sm --start MARGINAL_RELIEF_CALCULATOR_BACKEND```
-
-```sm --start DATASTREAM```
 
 ## REST API Details
 
