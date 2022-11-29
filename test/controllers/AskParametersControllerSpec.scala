@@ -43,12 +43,10 @@ class AskParametersControllerSpec extends AnyFreeSpec with Matchers with Idiomat
     "return associated companies parameter info successfully" in new Fixture {
       mockRequiredParametersService.associatedCompaniesParameters(
         accountingPeriodStart,
-        accountingPeriodEnd,
-        0,
-        None
+        accountingPeriodEnd
       ) returns AskOnePart(Period(accountingPeriodStart, accountingPeriodEnd)).validNel
 
-      val result = controller.associatedCompanies(accountingPeriodStart, accountingPeriodEnd, 0, None)(fakeRequest)
+      val result = controller.associatedCompanies(accountingPeriodStart, accountingPeriodEnd)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsJson(result).as[AssociatedCompaniesParameter] shouldBe AskOnePart(
@@ -59,13 +57,11 @@ class AskParametersControllerSpec extends AnyFreeSpec with Matchers with Idiomat
     "returns error, when upstream service has error" in new Fixture {
       mockRequiredParametersService.associatedCompaniesParameters(
         accountingPeriodStart,
-        accountingPeriodEnd,
-        0,
-        None
+        accountingPeriodEnd
       ) returns ConfigMissingError(0).invalidNel
 
       try
-        controller.associatedCompanies(accountingPeriodStart, accountingPeriodEnd, 0, None)(fakeRequest)
+        controller.associatedCompanies(accountingPeriodStart, accountingPeriodEnd)(fakeRequest)
       catch {
         case e: Throwable =>
           e shouldBe a[UnprocessableEntityException]

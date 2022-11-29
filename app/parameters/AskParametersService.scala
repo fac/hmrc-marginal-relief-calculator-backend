@@ -32,9 +32,7 @@ trait AskParametersService {
 
   def associatedCompaniesParameters(
     accountingPeriodStart: LocalDate,
-    accountingPeriodEnd: LocalDate,
-    profit: Double,
-    exemptDistributions: Option[Double]
+    accountingPeriodEnd: LocalDate
   ): ValidationResult[AssociatedCompaniesParameter]
 }
 
@@ -43,9 +41,7 @@ class AskParametersServiceImpl @Inject() (appConfig: AppConfig) extends AskParam
 
   override def associatedCompaniesParameters(
     accountingPeriodStart: LocalDate,
-    accountingPeriodEnd: LocalDate,
-    profit: Double,
-    exemptDistributions: Option[Double]
+    accountingPeriodEnd: LocalDate
   ): ValidationResult[AssociatedCompaniesParameter] = {
 
     def findConfig: Int => ValidationResult[FYConfig] = appConfig.calculatorConfig.findFYConfig(_)(ConfigMissingError)
