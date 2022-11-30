@@ -32,12 +32,10 @@ class AskParametersController @Inject() (parametersService: AskParametersService
 
   def associatedCompanies(
     accountingPeriodStart: LocalDate,
-    accountingPeriodEnd: LocalDate,
-    profit: Double,
-    exemptDistributions: Option[Double]
+    accountingPeriodEnd: LocalDate
   ): Action[AnyContent] = Action.async { _ =>
     parametersService
-      .associatedCompaniesParameters(accountingPeriodStart, accountingPeriodEnd, profit, exemptDistributions)
+      .associatedCompaniesParameters(accountingPeriodStart, accountingPeriodEnd)
       .fold(
         errors =>
           throw new UnprocessableEntityException(

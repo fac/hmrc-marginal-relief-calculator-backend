@@ -40,9 +40,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2023, 4, 1),
-        LocalDate.of(2024, 3, 31),
-        0,
-        None
+        LocalDate.of(2024, 3, 31)
       ) shouldBe ConfigMissingError(2023).invalidNel
     }
 
@@ -64,9 +62,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2023, 4, 1),
-        LocalDate.of(2024, 3, 31),
-        0,
-        None
+        LocalDate.of(2024, 3, 31)
       ) shouldBe AskFull.validNel
     }
 
@@ -79,9 +75,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2023, 1, 1),
-        LocalDate.of(2023, 12, 31),
-        0,
-        None
+        LocalDate.of(2023, 12, 31)
       ) shouldBe Invalid(NonEmptyList.of(ConfigMissingError(2022), ConfigMissingError(2023)))
     }
 
@@ -99,9 +93,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2022, 4, 1),
-        LocalDate.of(2023, 3, 31),
-        0,
-        None
+        LocalDate.of(2023, 3, 31)
       ) shouldBe DontAsk.validNel
     }
 
@@ -123,9 +115,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2023, 1, 1),
-        LocalDate.of(2023, 12, 31),
-        0,
-        None
+        LocalDate.of(2023, 12, 31)
       ) shouldBe DontAsk.validNel
     }
 
@@ -155,9 +145,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2024, 1, 1),
-        LocalDate.of(2024, 12, 31),
-        0,
-        None
+        LocalDate.of(2024, 12, 31)
       ) shouldBe AskFull.validNel
     }
 
@@ -187,9 +175,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2024, 1, 1),
-        LocalDate.of(2024, 12, 31),
-        0,
-        None
+        LocalDate.of(2024, 12, 31)
       ) shouldBe AskBothParts(
         Period(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 3, 31)),
         Period(LocalDate.of(2024, 4, 1), LocalDate.of(2024, 12, 31))
@@ -222,9 +208,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2024, 1, 1),
-        LocalDate.of(2024, 12, 31),
-        0,
-        None
+        LocalDate.of(2024, 12, 31)
       ) shouldBe AskBothParts(
         Period(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 3, 31)),
         Period(LocalDate.of(2024, 4, 1), LocalDate.of(2024, 12, 31))
@@ -257,9 +241,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2024, 1, 1),
-        LocalDate.of(2024, 12, 31),
-        0,
-        None
+        LocalDate.of(2024, 12, 31)
       ) shouldBe AskBothParts(
         Period(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 3, 31)),
         Period(LocalDate.of(2024, 4, 1), LocalDate.of(2024, 12, 31))
@@ -288,9 +270,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2023, 1, 1),
-        LocalDate.of(2023, 12, 31),
-        0,
-        None
+        LocalDate.of(2023, 12, 31)
       ) shouldBe AskOnePart(Period(LocalDate.of(2023, 4, 1), LocalDate.of(2023, 12, 31))).validNel
     }
 
@@ -316,9 +296,7 @@ class AskParametersServiceSpec extends AnyFreeSpec with Matchers {
                                                                        |""".stripMargin)
       requiredParametersService.associatedCompaniesParameters(
         LocalDate.of(2024, 1, 1),
-        LocalDate.of(2024, 12, 31),
-        0,
-        None
+        LocalDate.of(2024, 12, 31)
       ) shouldBe AskOnePart(Period(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 3, 31))).validNel
     }
   }
