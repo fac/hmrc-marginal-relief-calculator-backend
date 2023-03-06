@@ -80,7 +80,12 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
             taxRate
           )
         case marginalReliefConfig: MarginalReliefConfig =>
-          val fyRatioValues = ratioValuesForAdjustingThresholds(None, daysInAP, daysInFY(fy), daysInAP)
+          val fyRatioValues = ratioValuesForAdjustingThresholds(
+            UpperThresholds(None, Some(marginalReliefConfig.upperThreshold)),
+            daysInAP,
+            daysInFY(fy),
+            daysInAP
+          )
           val fyRatio = ratioForAdjustingThresholds(fyRatioValues)
           val companies = associatedCompanies.getOrElse(0) + 1
           val adjustedLT = adjustedThreshold(marginalReliefConfig.lowerThreshold, fyRatio, companies)
@@ -173,13 +178,13 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
           )
         case (fy1Config: MarginalReliefConfig, fy2Config: MarginalReliefConfig) =>
           val fy1RatioValues = ratioValuesForAdjustingThresholds(
-            Some(UpperThresholds(fy1Config.upperThreshold, fy2Config.upperThreshold)),
+            UpperThresholds(Some(fy1Config.upperThreshold), Some(fy2Config.upperThreshold)),
             apDaysInFY1,
             daysInFY(fy1),
             daysInAP
           )
           val fy2RatioValues = ratioValuesForAdjustingThresholds(
-            Some(UpperThresholds(fy1Config.upperThreshold, fy2Config.upperThreshold)),
+            UpperThresholds(Some(fy1Config.upperThreshold), Some(fy2Config.upperThreshold)),
             apDaysInFY2,
             daysInFY(fy2),
             daysInAP
@@ -280,7 +285,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
         case (fy1Config: FlatRateConfig, fy2Config: MarginalReliefConfig) =>
           val ctFY1 = BigDecimal(fy1Config.mainRate) * adjustedProfitFY1
           val fy2RatioValues = ratioValuesForAdjustingThresholds(
-            None,
+            UpperThresholds(None, Some(fy2Config.upperThreshold)),
             apDaysInFY2,
             daysInFY(fy2),
             daysInAP
@@ -340,7 +345,7 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
           )
         case (fy1Config: MarginalReliefConfig, fy2Config: FlatRateConfig) =>
           val fy1RatioValues = ratioValuesForAdjustingThresholds(
-            None,
+            UpperThresholds(Some(fy1Config.upperThreshold), None),
             apDaysInFY1,
             daysInFY(fy1),
             daysInAP
@@ -455,20 +460,23 @@ class MarginalReliefCalculatorImpl @Inject() (appConfig: AppConfig) extends Marg
       BigDecimal(0)
     }
 
-  case class UpperThresholds(upperThresholdFY1: Int, upperThresholdFY2: Int)
+  case class UpperThresholds(upperThresholdFY1: Option[Int], upperThresholdFY2: Option[Int])
 
   private def ratioValuesForAdjustingThresholds(
-    maybeUpperThresholds: Option[UpperThresholds],
+    thresholds: UpperThresholds,
     apDaysInFY: Int,
     fyDays: Int,
     daysInAP: Int
-  ): FYRatio =
-    maybeUpperThresholds match {
-      case Some(UpperThresholds(upperThresholdFY1, upperThresholdFY2)) if upperThresholdFY1 != upperThresholdFY2 =>
-        FYRatio(BigDecimal(apDaysInFY), fyDays)
-      case _ => // flat rate year
-        FYRatio(BigDecimal(apDaysInFY), if (daysInAP == 366) 366 else 365)
+  ): FYRatio = {
+
+    val totalNoOfDays = (thresholds.upperThresholdFY1, thresholds.upperThresholdFY2) match {
+      case (fy1 @ _, fy2 @ _) if fy1 == fy2 => 365 max daysInAP
+      case _                                => fyDays
     }
+
+    FYRatio(BigDecimal(apDaysInFY), totalNoOfDays)
+  }
+
   private def ratioForAdjustingThresholds(values: FYRatio): BigDecimal = values.numerator / values.denominator
 
   private def adjustedThreshold(threshold: Int, fyRatio: BigDecimal, companies: Int): BigDecimal =
