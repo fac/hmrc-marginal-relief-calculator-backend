@@ -859,10 +859,10 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
               131849.32,
               0.0,
               131849.32,
-              12557.08,
-              62785.39,
+              12522.77,
+              62613.84,
               275,
-              FYRatio(275, 365)
+              FYRatio(275, 366)
             ),
             23.52
           ).valid
@@ -960,18 +960,18 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
             2023,
             11301.37,
             25.0,
-            11037.67,
+            11040.24,
             24.42,
-            263.7,
+            261.13,
             45205.48,
             0.0,
             45205.48,
-            12557.08,
-            62785.39,
+            12522.77,
+            62613.84,
             275,
-            FYRatio(275, 365)
+            FYRatio(275, 366)
           ),
-          23.08
+          23.09
         ).valid
     }
 
@@ -1000,31 +1000,31 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
       val result = marginalReliefCalculator.compute(
         LocalDate.of(2023, 1, 1),
         LocalDate.of(2023, 12, 31),
-        50000,
-        10000,
-        Some(1),
+        60000,
+        0,
+        Some(2),
         None,
         None
       )
       result shouldBe
         DualResult(
-          FlatRate(2022, 2342.47, 19.0, 12328.77, 2465.75, 14794.52, 90),
+          FlatRate(2022, 2810.96, 19.0, 14794.52, 0.0, 14794.52, 90),
           MarginalRate(
             2023,
-            9417.81,
+            11301.37,
             25.0,
-            8805.65,
-            23.38,
-            612.16,
-            37671.23,
-            7534.25,
+            11040.24,
+            24.42,
+            261.13,
             45205.48,
-            18835.62,
-            94178.08,
+            0.0,
+            45205.48,
+            12522.77,
+            62613.84,
             275,
-            FYRatio(275, 365)
+            FYRatio(275, 366)
           ),
-          22.3
+          23.09
         ).valid
     }
 
