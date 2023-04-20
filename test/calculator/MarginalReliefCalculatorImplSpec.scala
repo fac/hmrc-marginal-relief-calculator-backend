@@ -130,6 +130,54 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
         )
         result shouldBe SingleResult(FlatRate(2022, 19000.0, 19.0, 100000, 0, 100000, 365), 19).valid
       }
+
+      "when a shorter account period falls in a single FY with MR and profits are above the upper threshold, apply main rate and MR ratio with 365 days" in {
+        val marginalReliefCalculator =
+          new MarginalReliefCalculatorImpl(appConfigFromStr("""
+                                                              |appName = test
+                                                              |calculator-config = {
+                                                              | fy-configs = [
+                                                              |   {
+                                                              |     year = 2023
+                                                              |     lower-threshold = 50000
+                                                              |     upper-threshold = 250000
+                                                              |     small-profit-rate = 0.19
+                                                              |     main-rate = 0.25
+                                                              |     marginal-relief-fraction = 0.015
+                                                              |   }
+                                                              | ]
+                                                              |}
+                                                              |""".stripMargin))
+
+        val result = marginalReliefCalculator.compute(
+          LocalDate.of(2023, 5, 1),
+          LocalDate.of(2024, 3, 31),
+          300000,
+          0,
+          None,
+          None,
+          None
+        )
+        result shouldBe SingleResult(
+          MarginalRate(
+            2023,
+            75000.0,
+            25.0,
+            75000.0,
+            25.0,
+            0.0,
+            300000.0,
+            0.0,
+            300000.0,
+            46027.4,
+            230136.99,
+            336,
+            FYRatio(336, 365)
+          ),
+          25
+        ).valid
+      }
+
       "when account period falls in FY with marginal relief and profits are above the upper threshold, apply main rate" in {
         val marginalReliefCalculator =
           new MarginalReliefCalculatorImpl(appConfigFromStr("""
@@ -176,6 +224,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           25
         ).valid
       }
+
       "when account period falls in FY with marginal relief and profits are matching lower threshold, apply small profits rate" in {
         val marginalReliefCalculator =
           new MarginalReliefCalculatorImpl(appConfigFromStr("""
@@ -222,6 +271,7 @@ class MarginalReliefCalculatorImplSpec extends AnyWordSpec with Matchers {
           19
         ).valid
       }
+
       "when account period falls in FY with marginal relief and profits are below lower threshold, apply small profits rate" in {
         val marginalReliefCalculator =
           new MarginalReliefCalculatorImpl(appConfigFromStr("""
